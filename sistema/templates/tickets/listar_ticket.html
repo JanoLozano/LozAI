@@ -1,0 +1,178 @@
+{% if modo_usuario %}
+    <h1>Mis Tickets - {{ usuario_actual.nombre }}</h1>
+{% else %}
+    <h1>Tickets</h1>
+{% endif %}
+
+<a href="{% url 'crear_ticket' %}">Crear Ticket</a>
+<a href="/">Volver al Dashboard</a>
+
+<hr>
+
+<div style="display:flex; gap:20px; align-items:flex-start;">
+
+    <div style="width:60%;">
+        <h2>Listado</h2>
+
+        <table border="1" width="100%">
+            <tr>
+                <th>ID</th>
+                <th>Usuario</th>
+                <th>Máquina</th>
+                <th>Descripción</th>
+                <th>Estado</th>
+                <th>Fecha</th>
+            </tr>
+
+            {% for ticket in tickets %}
+                {% if modo_usuario %}
+                    <tr style="cursor:pointer;" class="ticket-row"
+                        data-url="{% url 'detalle_mi_ticket' usuario_actual.id ticket.id %}">
+                {% else %}
+                    <tr style="cursor:pointer;" class="ticket-row"
+                        data-url="{% url 'detalle_ticket' ticket.id %}">
+                {% endif %}
+
+                    <td>#{{ ticket.id }}</td>
+                    <td>
+                        {% if ticket.usuario %}
+                            {{ ticket.usuario.nombre }}
+                        {% else %}
+                            Usuario eliminado
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if ticket.maquina %}
+                            {{ ticket.maquina.nombre }}
+                        {% else %}
+                            Sin máquina
+                        {% endif %}
+                    </td>
+
+                    <td>{{ ticket.descripcion }}</td>
+                    <td>{{ ticket.get_estado_display }}</td>
+                    <td>{{ ticket.fecha_creacion }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6">No hay tickets registrados.</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div style="width:40%; border:1px solid #ccc; padding:15px;">
+        {% if ticket_seleccionado %}
+
+            <h2>Ticket #{{ ticket_seleccionado.id }}</h2>
+
+            <p>
+                <strong>Usuario:</strong>
+
+                {% if ticket_seleccionado.usuario %}
+                    {{ ticket_seleccionado.usuario.nombre }}
+                {% else %}
+                    Usuario eliminado
+                {% endif %}
+            </p>
+
+            <p>
+                <strong>Máquina:</strong>
+                {% if ticket_seleccionado.maquina %}
+                    {{ ticket_seleccionado.maquina.nombre }} - {{ ticket_seleccionado.maquina.ip }}
+                {% else %}
+                    Sin máquina asignada
+                {% endif %}
+            </p>
+
+            <p>
+                <strong>Descripción:</strong><br>
+                {{ ticket_seleccionado.descripcion }}
+            </p>
+
+            <p>
+                <strong>Estado actual:</strong>
+                {{ ticket_seleccionado.get_estado_display }}
+            </p>
+
+            <hr>
+
+            {% if not modo_usuario %}
+                <h3>Gestionar ticket</h3>
+
+                <form method="post" action="{% url 'cambiar_estado_ticket' ticket_seleccionado.id %}">
+                    {% csrf_token %}
+
+                    <p>
+                        Estado:
+                        <select name="estado">
+                            <option value="pendiente"
+                                {% if ticket_seleccionado.estado == 'pendiente' %}selected{% endif %}>
+                                Pendiente
+                            </option>
+
+                            <option value="en_proceso"
+                                {% if ticket_seleccionado.estado == 'en_proceso' %}selected{% endif %}>
+                                En Proceso
+                            </option>
+
+                            <option value="completada"
+                                {% if ticket_seleccionado.estado == 'completada' %}selected{% endif %}>
+                                Completada
+                            </option>
+                        </select>
+                    </p>
+
+                    <p>
+                        Seguimiento:
+                        <br>
+                        <textarea name="seguimiento" rows="4" cols="50"
+                            placeholder="Ej: Se revisó la conexión, se reinició el equipo..."></textarea>
+                    </p>
+
+                    <button type="submit">Guardar cambios</button>
+                </form>
+
+                <hr>
+            {% endif %}
+
+            <h3>Seguimiento</h3>
+
+            {% if seguimiento %}
+                <ul>
+                    {% for item in seguimiento %}
+                        <li>
+                            <strong>{{ item.fecha }}</strong><br>
+
+                            {% if item.estado_anterior != item.estado_nuevo %}
+                                Estado: {{ item.estado_anterior }} → {{ item.estado_nuevo }}<br>
+                            {% endif %}
+
+                            {% if item.comentario %}
+                                Comentario: {{ item.comentario }}
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Este ticket todavía no tiene seguimiento.</p>
+            {% endif %}
+
+        {% else %}
+
+            <h2>Detalle</h2>
+            <p>Seleccioná un ticket de la lista para ver la información.</p>
+
+        {% endif %}
+    </div>
+
+</div>
+
+<script>
+    document.querySelectorAll('.ticket-row').forEach(row => {
+        row.addEventListener('click', function() {
+            window.location.href = this.dataset.url;
+        });
+    });
+</script>

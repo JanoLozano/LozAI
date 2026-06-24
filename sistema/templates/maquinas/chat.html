@@ -1,0 +1,15 @@
+<h1>LozAI - {{ maquina.nombre }}</h1>
+
+<p>IP: {{ maquina.ip }}</p>
+<p>Estado: {{ maquina.estado }}</p>
+
+<a href="{% url 'listar_maquinas' %}">Volver a máquinas</a>
+
+<hr>
+
+<form method="post">
+{% csrf_token %}
+    <textarea name="mensaje" rows="5" cols="60" placeholder="Escribí tu solicitud para esta máquina..."></textarea>
+    <br>
+    <button type="submit">Enviar solicitud</button>
+</form>

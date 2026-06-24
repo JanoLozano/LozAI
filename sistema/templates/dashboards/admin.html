@@ -1,0 +1,17 @@
+<h1>Dashboard Administrador</h1>
+
+<p>Bienvenido, {{ request.session.usuario_nombre }}</p>
+
+<ul>
+    <li>
+        <a href="{% url 'listar_usuarios' %}">
+            Gestionar usuarios
+        </a>
+    </li>
+
+    <li>
+        <a href="{% url 'logout' %}">
+            Cerrar sesión
+        </a>
+    </li>
+</ul>

@@ -1,0 +1,9 @@
+<h1>Dashboard Usuario</h1>
+
+<p>Bienvenido, {{ request.session.usuario_nombre }}</p>
+
+<ul>
+    <li><a href="{% url 'crear_ticket' %}">Crear ticket</a></li>
+    <li><a href="{% url 'mis_tickets_usuario' request.session.usuario_id %}">Mis tickets</a></li>
+    <li><a href="{% url 'logout' %}">Cerrar sesión</a></li>
+</ul>
