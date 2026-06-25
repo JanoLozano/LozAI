@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Tickets | LozAI{% endblock %}
+{% block page_eyebrow %}Soporte tecnico{% endblock %}
+{% block page_title %}Tickets{% endblock %}
+{% block page_description %}Consulta y actualiza las solicitudes de soporte.{% endblock %}
+{% block page_status %}Gestion de tickets{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/tickets.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="tickets-container">
+
+    <section class="tickets-list">
+        <h2>Solicitudes</h2>
+
+        {% for ticket in tickets %}
+            <a href="{% url 'detalle_ticket' ticket.id %}"
+                class="ticket {% if ticket_seleccionado.id == ticket.id %}ticket-active{% endif %}">
+
+                <div class="ticket-header">
+                    <strong>Ticket #{{ ticket.id }}</strong>
+                    <span class="estado estado-{{ ticket.estado }}">
+                        {{ ticket.get_estado_display }}
+                    </span>
+                </div>
+
+                <p>{{ ticket.descripcion|truncatechars:80 }}</p>
+
+                <small>
+                    {% if ticket.usuario %}
+                        {{ ticket.usuario.nombre }}
+                    {% else %}
+                        Usuario no disponible
+                    {% endif %}
+                    · {{ ticket.fecha_creacion|date:"d/m/Y" }}
+                </small>
+            </a>
+        {% empty %}
+            <p class="empty-message">No hay tickets registrados.</p>
+        {% endfor %}
+    </section>
+
+    <section class="ticket-detail">
+        {% if ticket_seleccionado %}
+            <h2>Ticket #{{ ticket_seleccionado.id }}</h2>
+
+            <div class="ticket-info">
+                <p>
+                    <strong>Usuario:</strong>
+                    {% if ticket_seleccionado.usuario %}
+                        {{ ticket_seleccionado.usuario.nombre }}
+                    {% else %}
+                        No disponible
+                    {% endif %}
+                </p>
+
+                <p>
+                    <strong>Maquina:</strong>
+                    {% if ticket_seleccionado.maquina %}
+                        {{ ticket_seleccionado.maquina.nombre }}
+                    {% else %}
+                        Sin maquina asociada
+                    {% endif %}
+                </p>
+
+                <p><strong>Descripcion:</strong></p>
+                <p>{{ ticket_seleccionado.descripcion }}</p>
+            </div>
+
+            <form method="post"
+                action="{% url 'cambiar_estado_ticket' ticket_seleccionado.id %}">
+                {% csrf_token %}
+
+                <label for="estado">Estado</label>
+                <select name="estado" id="estado">
+                    <option value="pendiente"
+                        {% if ticket_seleccionado.estado == "pendiente" %}selected{% endif %}>
+                        Pendiente
+                    </option>
+                    <option value="en_proceso"
+                        {% if ticket_seleccionado.estado == "en_proceso" %}selected{% endif %}>
+                        En proceso
+                    </option>
+                    <option value="completada"
+                        {% if ticket_seleccionado.estado == "completada" %}selected{% endif %}>
+                        Completada
+                    </option>
+                </select>
+
+                <label for="seguimiento">Comentario</label>
+                <textarea name="seguimiento"
+                        id="seguimiento"
+                        rows="4"
+                        placeholder="Escribe el seguimiento realizado"></textarea>
+
+                <button type="submit">Guardar cambios</button>
+            </form>
+
+            <div class="history">
+                <h3>Historial</h3>
+
+                {% for item in seguimiento %}
+                    <div class="history-item">
+                        <small>{{ item.fecha|date:"d/m/Y H:i" }}</small>
+
+                        {% if item.estado_anterior != item.estado_nuevo %}
+                            <p>
+                                Estado: {{ item.estado_anterior|default:"Inicio" }}
+                                → {{ item.estado_nuevo }}
+                            </p>
+                        {% endif %}
+
+                        {% if item.comentario %}
+                            <p>{{ item.comentario }}</p>
+                        {% endif %}
+                    </div>
+                {% empty %}
+                    <p class="empty-message">No hay seguimientos registrados.</p>
+                {% endfor %}
+            </div>
+
+        {% else %}
+            <div class="select-message">
+                <i class="bi bi-ticket"></i>
+                <h2>Selecciona un ticket</h2>
+                <p>Elige una solicitud para ver su detalle.</p>
+            </div>
+        {% endif %}
+    </section>
+
+</div>
+{% endblock %}

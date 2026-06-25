@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Administracion | LozAI{% endblock %}
+{% block page_eyebrow %}Area administrativa{% endblock %}
+{% block page_title %}Hola, {{ request.session.usuario_nombre }}{% endblock %}
+{% block page_description %}Administra los usuarios que acceden al sistema.{% endblock %}
+{% block page_status %}Acceso administrativo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="dashboard-section">
+    <header class="section-heading">
+        <span class="section-kicker">Gestion</span>
+        <h2>Usuarios del sistema</h2>
+        <p>Crea cuentas, modifica datos y controla el acceso.</p>
+    </header>
+
+    <a href="{% url 'listar_usuarios' %}" class="stat-card">
+        <span class="stat-icon"><i class="bi bi-people"></i></span>
+        <h3>Usuarios</h3>
+        <strong>Administrar cuentas</strong>
+        <p>Consulta el listado y realiza altas, ediciones o bajas logicas.</p>
+        <span class="stat-link">Abrir listado <i class="bi bi-arrow-right"></i></span>
+    </a>
+</section>
+
+<section class="dashboard-section">
+    <header class="section-heading">
+        <span class="section-kicker">Funciones</span>
+        <h2>Control administrativo</h2>
+    </header>
+
+    <div class="scope-grid">
+        <article class="scope-item">
+            <i class="bi bi-person-badge"></i>
+            <div>
+                <h3>Roles</h3>
+                <p>Asigna perfiles de administrador, tecnico o usuario.</p>
+            </div>
+        </article>
+
+        <article class="scope-item">
+            <i class="bi bi-shield-check"></i>
+            <div>
+                <h3>Acceso</h3>
+                <p>Activa o desactiva cuentas sin borrar su historial.</p>
+            </div>
+        </article>
+    </div>
+</section>
+{% endblock %}

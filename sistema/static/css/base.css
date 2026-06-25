@@ -1,0 +1,195 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap");
+
+:root {
+    --bg-dark: #070b1a;
+    --surface: #0f172a;
+    --line: rgba(148, 163, 184, .2);
+    --text-main: #f8fafc;
+    --text-soft: #cbd5e1;
+    --text-muted: #94a3b8;
+    --primary: #7c3aed;
+    --primary-light: #a78bfa;
+    --secondary: #06b6d4;
+    --accent: #38bdf8;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Space Grotesk", Arial, sans-serif;
+    color: var(--text-main);
+    background:
+        radial-gradient(circle at top left, rgba(124, 58, 237, .2), transparent 30%),
+        var(--bg-dark);
+}
+
+.loz-shell {
+    width: min(1200px, calc(100% - 32px));
+    margin: 16px auto 40px;
+}
+
+.loz-navbar {
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: rgba(15, 23, 42, .9);
+}
+
+.loz-brand,
+.loz-menu,
+.loz-user {
+    display: flex;
+    align-items: center;
+}
+
+.loz-brand {
+    gap: 10px;
+    color: white;
+    text-decoration: none;
+}
+
+.loz-logo {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    font-weight: 700;
+}
+
+.loz-menu {
+    gap: 8px;
+}
+
+.loz-menu a {
+    padding: 8px 12px;
+    border-radius: 9px;
+    color: var(--text-soft);
+    text-decoration: none;
+}
+
+.loz-menu a:hover {
+    color: white;
+    background: rgba(124, 58, 237, .18);
+}
+
+.loz-user {
+    gap: 10px;
+    color: var(--text-soft);
+    font-size: 13px;
+}
+
+.loz-user a {
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    color: white;
+    background: var(--primary);
+}
+
+.loz-hero {
+    margin-top: 20px;
+    padding: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    background: linear-gradient(135deg, #111827, #24125f);
+}
+
+.loz-hero small {
+    color: #a5f3fc;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.loz-hero h1 {
+    margin: 6px 0;
+    font-size: clamp(28px, 4vw, 42px);
+}
+
+.loz-hero p {
+    margin: 0;
+    color: var(--text-soft);
+}
+
+.loz-status {
+    padding: 8px 12px;
+    border-radius: 20px;
+    color: #a7f3d0;
+    background: rgba(16, 185, 129, .15);
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.loz-content {
+    margin-top: 20px;
+    padding: 24px;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    background: rgba(15, 23, 42, .8);
+}
+
+.loz-version {
+    margin-top: 12px;
+    padding-left: 4px;
+    color: rgba(148, 163, 184, .45);
+    font-size: 10px;
+    letter-spacing: .04em;
+}
+
+.btn-primary {
+    border: 0;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+}
+
+@media (max-width: 800px) {
+    .loz-navbar {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .loz-menu {
+        width: 100%;
+        order: 3;
+        overflow-x: auto;
+    }
+
+    .loz-menu a {
+        white-space: nowrap;
+    }
+
+    .loz-hero {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 500px) {
+    .loz-shell {
+        width: calc(100% - 20px);
+        margin-top: 10px;
+    }
+
+    .loz-user span {
+        display: none;
+    }
+
+    .loz-hero,
+    .loz-content {
+        padding: 20px;
+    }
+}

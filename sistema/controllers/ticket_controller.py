@@ -1,13 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from sistema.models import Solicitud, Usuario, Maquina, SeguimientoTicket
+from sistema.src.autorizacion import validar_roles, redirigir_segun_rol
 
 
 def listar_tickets(request):
-    if request.session.get('usuario_rol') != 'tecnico':
-        return redirect('login')
+    redireccion = validar_roles(request, ["tecnico"])
+    if redireccion:
+        return redireccion
     tickets = Solicitud.objects.all().order_by('-fecha_creacion')
 
-    return render(request, 'tickets/listar_ticket.html', {
+    return render(request, 'tecnico/tickets.html', {
         'tickets': tickets
     })
 
@@ -15,9 +17,11 @@ def listar_tickets(request):
 def crear_ticket(request):
     rol = request.session.get('usuario_rol')
     usuario_logueado_id = request.session.get('usuario_id')
+    template = 'usuario/tickest.html' if rol == 'usuario' else 'tecnico/tickets.html'
 
-    if rol not in ['usuario', 'tecnico']:
-        return redirect('login')
+    redireccion = validar_roles(request, ["usuario", "tecnico"])
+    if redireccion:
+        return redireccion
 
     usuarios = Usuario.objects.all()
     maquinas = Maquina.objects.all()
@@ -32,7 +36,7 @@ def crear_ticket(request):
             usuario_id = usuario_logueado_id
 
         if not usuario_id:
-            return render(request, 'tickets/crear_ticket.html', {
+            return render(request, template, {
                 'usuarios': usuarios,
                 'maquinas': maquinas,
                 'rol': rol,
@@ -40,7 +44,7 @@ def crear_ticket(request):
             })
 
         if not descripcion:
-            return render(request, 'tickets/crear_ticket.html', {
+            return render(request, template, {
                 'usuarios': usuarios,
                 'maquinas': maquinas,
                 'rol': rol,
@@ -58,7 +62,7 @@ def crear_ticket(request):
 
         return redirect('listar_tickets')
 
-    return render(request, 'tickets/crear_ticket.html', {
+    return render(request, template, {
         'usuarios': usuarios,
         'maquinas': maquinas,
         'rol': rol
@@ -66,6 +70,10 @@ def crear_ticket(request):
 
 
 def detalle_ticket(request, ticket_id):
+    redireccion = validar_roles(request, ["tecnico"])
+    if redireccion:
+        return redireccion
+
     tickets = Solicitud.objects.all().order_by('-fecha_creacion')
     ticket_seleccionado = get_object_or_404(Solicitud, id=ticket_id)
 
@@ -73,7 +81,7 @@ def detalle_ticket(request, ticket_id):
         ticket=ticket_seleccionado
     ).order_by('-fecha')
 
-    return render(request, 'tickets/listar_ticket.html', {
+    return render(request, 'tecnico/tickets.html', {
         'tickets': tickets,
         'ticket_seleccionado': ticket_seleccionado,
         'seguimiento': seguimiento
@@ -81,6 +89,10 @@ def detalle_ticket(request, ticket_id):
 
 
 def cambiar_estado_ticket(request, ticket_id):
+    redireccion = validar_roles(request, ["tecnico"])
+    if redireccion:
+        return redireccion
+
     ticket = get_object_or_404(Solicitud, id=ticket_id)
 
     if request.method == 'POST':
@@ -103,11 +115,12 @@ def cambiar_estado_ticket(request, ticket_id):
     return redirect('detalle_ticket', ticket_id=ticket.id)
 
 def mis_tickets_usuario(request, usuario_id):
-    if request.session.get('usuario_id') != usuario_id:
-        return redirect('dashboard_usuario')
+    redireccion = validar_roles(request, ["usuario"])
+    if redireccion:
+        return redireccion
 
-    if request.session.get('usuario_rol') != 'usuario':
-        return redirect('login')
+    if request.session.get('usuario_id') != usuario_id:
+        return redirigir_segun_rol(request)
 
     usuario = get_object_or_404(Usuario, id=usuario_id)
 
@@ -115,15 +128,19 @@ def mis_tickets_usuario(request, usuario_id):
         usuario=usuario
     ).order_by('-fecha_creacion')
 
-    return render(request, 'tickets/listar_ticket.html', {
+    return render(request, 'usuario/tickest.html', {
         'tickets': tickets,
         'usuario_actual': usuario,
         'modo_usuario': True
     })
 
 def detalle_mi_ticket(request, usuario_id, ticket_id):
+    redireccion = validar_roles(request, ["usuario"])
+    if redireccion:
+        return redireccion
+
     if request.session.get('usuario_id') != usuario_id:
-        return redirect('dashboard_usuario')
+        return redirigir_segun_rol(request)
     
     usuario = get_object_or_404(Usuario, id=usuario_id)
 
@@ -141,7 +158,7 @@ def detalle_mi_ticket(request, usuario_id, ticket_id):
         ticket=ticket_seleccionado
     ).order_by('-fecha')
 
-    return render(request, 'tickets/listar_ticket.html', {
+    return render(request, 'usuario/tickest.html', {
         'tickets': tickets,
         'usuario_actual': usuario,
         'ticket_seleccionado': ticket_seleccionado,

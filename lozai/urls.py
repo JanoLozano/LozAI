@@ -17,7 +17,6 @@ from sistema.controllers.auth_controller import (
     register_view)
 from sistema.controllers.maquina_controller import (
     listar_maquinas,
-    chat_maquina,
     crear_maquina,
     editar_maquina,
     eliminar_maquina
@@ -30,6 +29,7 @@ from sistema.controllers.ticket_controller import (
     crear_ticket,
     cambiar_estado_ticket
 )
+from sistema.controllers.lozai_controller import chat_lozai
 
 urlpatterns = [
     # Rutas para el panel de control
@@ -37,7 +37,6 @@ urlpatterns = [
     path('', dashboard, name='dashboard'),
     # Rutas para la gestión de máquinas
     path('maquinas/', listar_maquinas, name='listar_maquinas'),
-    path('maquinas/<int:maquina_id>/chat/', chat_maquina, name='chat_maquina'),
     path('maquinas/crear/', crear_maquina, name='crear_maquina'),
     path('maquinas/<int:maquina_id>/editar/', editar_maquina, name='editar_maquina'),
     path('maquinas/<int:maquina_id>/eliminar/', eliminar_maquina, name='eliminar_maquina'),
@@ -60,4 +59,5 @@ urlpatterns = [
     path('usuarios/', listar_usuarios, name='listar_usuarios'),
     path('usuarios/<int:usuario_id>/editar/', editar_usuario, name='editar_usuario'),
     path('usuarios/<int:usuario_id>/eliminar/', cambiar_estado_usuario, name='cambiar_estado_usuario'),
+    path('maquinas/<int:maquina_id>/chat/', chat_lozai, name='chat_maquina'),
 ]

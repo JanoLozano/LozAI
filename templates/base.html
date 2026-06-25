@@ -1,0 +1,70 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}LozAI{% endblock %}</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+<div class="loz-shell">
+
+    <header class="loz-navbar">
+        <a class="loz-brand" href="{% url 'dashboard' %}">
+            <span class="loz-logo">AI</span>
+            <strong>LozAI</strong>
+        </a>
+
+        <nav class="loz-menu">
+            {% if request.session.usuario_rol == "admin" %}
+                <a href="{% url 'dashboard_admin' %}">Inicio</a>
+                <a href="{% url 'listar_usuarios' %}">Usuarios</a>
+            {% elif request.session.usuario_rol == "tecnico" %}
+                <a href="{% url 'dashboard_tecnico' %}">Inicio</a>
+                <a href="{% url 'listar_maquinas' %}">Maquinas</a>
+                <a href="{% url 'listar_tickets' %}">Tickets</a>
+            {% elif request.session.usuario_rol == "usuario" %}
+                <a href="{% url 'dashboard_usuario' %}">Inicio</a>
+                <a href="{% url 'mis_tickets_usuario' request.session.usuario_id %}">Mis tickets</a>
+                <a href="{% url 'crear_ticket' %}">Crear ticket</a>
+            {% endif %}
+        </nav>
+
+        <div class="loz-user">
+            <span>{{ request.session.usuario_nombre }}</span>
+            <a href="{% url 'logout' %}" title="Cerrar sesion">
+                <i class="bi bi-box-arrow-right"></i>
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <section class="loz-hero">
+            <div>
+                <small>{% block page_eyebrow %}Panel LozAI{% endblock %}</small>
+                <h1>{% block page_title %}Panel{% endblock %}</h1>
+                <p>{% block page_description %}Gestiona el sistema desde este panel.{% endblock %}</p>
+            </div>
+            <span class="loz-status">{% block page_status %}Disponible{% endblock %}</span>
+        </section>
+
+        <section class="loz-content">
+            {% block content %}{% endblock %}
+        </section>
+    </main>
+
+    <footer class="loz-version">
+        {{ configuracion_sistema.obtener_nombre }} · v{{ configuracion_sistema.obtener_version }}
+    </footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

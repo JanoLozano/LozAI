@@ -1,26 +1,32 @@
 from django.shortcuts import redirect, render
-
+from sistema.src.autorizacion import validar_roles, redirigir_segun_rol
 
 def dashboard(request):
-    return render(request, 'dashboard.html')
+    if not request.session.get("usuario_id"):
+        return redirect("login")
+
+    return redirigir_segun_rol(request)
 
 
 def dashboard_admin(request):
-    if request.session.get('usuario_rol') != 'admin':
-        return redirect('login')
+    redireccion = validar_roles(request, ["admin"])
+    if redireccion:
+        return redireccion
 
-    return render(request, 'dashboards/admin.html')
+    return render(request, "dashboards/admin.html")
 
 
 def dashboard_tecnico(request):
-    if request.session.get('usuario_rol') != 'tecnico':
-        return redirect('login')
+    redireccion = validar_roles(request, ["tecnico"])
+    if redireccion:
+        return redireccion
 
-    return render(request, 'dashboards/tecnico.html')
+    return render(request, "dashboards/tecnico.html")
 
 
 def dashboard_usuario(request):
-    if request.session.get('usuario_rol') != 'usuario':
-        return redirect('login')
+    redireccion = validar_roles(request, ["usuario"])
+    if redireccion:
+        return redireccion
 
-    return render(request, 'dashboards/usuario.html')
+    return render(request, "dashboards/usuario.html")

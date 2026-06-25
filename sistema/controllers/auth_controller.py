@@ -17,22 +17,13 @@ def login_view(request):
             request.session['usuario_nombre'] = usuario.nombre
             request.session['usuario_rol'] = usuario.role
 
-            if usuario.role == 'admin':
-                return redirect('dashboard_admin')
+            return redirect('dashboard')
 
-            if usuario.role == 'tecnico':
-                return redirect('dashboard_tecnico')
-
-            if usuario.role == 'usuario':
-                return redirect('dashboard_usuario')
-
-            return redirect('login')
-
-        return render(request, 'auth/login.html', {
+        return render(request, 'login.html', {
             'error': 'Email o contraseña incorrectos.'
         })
 
-    return render(request, 'auth/login.html')
+    return render(request, 'login.html')
 
 
 def logout_view(request):
@@ -46,12 +37,12 @@ def register_view(request):
         password = request.POST.get('password')
 
         if not nombre or not email or not password:
-            return render(request, 'auth/register.html', {
+            return render(request, 'register.html', {
                 'error': 'Todos los campos son obligatorios.'
             })
 
         if Usuario.objects.filter(email=email).exists():
-            return render(request, 'auth/register.html', {
+            return render(request, 'register.html', {
                 'error': 'Ya existe un usuario con ese email.'
             })
 
@@ -64,4 +55,4 @@ def register_view(request):
 
         return redirect('login')
 
-    return render(request, 'auth/register.html')
+    return render(request, 'register.html')

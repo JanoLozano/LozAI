@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Mi soporte | LozAI{% endblock %}
+{% block page_eyebrow %}Portal de asistencia{% endblock %}
+{% block page_title %}Hola, {{ request.session.usuario_nombre }}{% endblock %}
+{% block page_description %}Crea solicitudes y consulta su estado.{% endblock %}
+{% block page_status %}Soporte disponible{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="dashboard-section">
+    <header class="section-heading">
+        <span class="section-kicker">Soporte</span>
+        <h2>Que necesitas hacer</h2>
+    </header>
+
+    <div class="dashboard-grid">
+        <a href="{% url 'crear_ticket' %}" class="stat-card">
+            <span class="stat-icon"><i class="bi bi-plus-lg"></i></span>
+            <h3>Nueva solicitud</h3>
+            <strong>Crear ticket</strong>
+            <p>Informa un problema para recibir asistencia tecnica.</p>
+            <span class="stat-link">Crear <i class="bi bi-arrow-right"></i></span>
+        </a>
+
+        <a href="{% url 'mis_tickets_usuario' request.session.usuario_id %}" class="stat-card">
+            <span class="stat-icon"><i class="bi bi-clock-history"></i></span>
+            <h3>Seguimiento</h3>
+            <strong>Mis tickets</strong>
+            <p>Consulta el estado de tus solicitudes.</p>
+            <span class="stat-link">Consultar <i class="bi bi-arrow-right"></i></span>
+        </a>
+    </div>
+</section>
+
+<section class="dashboard-section">
+    <header class="section-heading">
+        <span class="section-kicker">Proceso</span>
+        <h2>Como funciona</h2>
+    </header>
+
+    <ol class="process-list">
+        <li><span>1</span><div><strong>Crear</strong><small>Describe el problema.</small></div></li>
+        <li><span>2</span><div><strong>Revision</strong><small>Un tecnico analiza el caso.</small></div></li>
+        <li><span>3</span><div><strong>Seguimiento</strong><small>Consulta los avances.</small></div></li>
+    </ol>
+</section>
+{% endblock %}

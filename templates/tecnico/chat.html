@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Chat LozAI | {{ maquina.nombre }}{% endblock %}
+{% block page_eyebrow %}Asistente tecnico{% endblock %}
+{% block page_title %}Chat con LozAI{% endblock %}
+{% block page_description %}Consulta el estado de {{ maquina.nombre }} y solicita pruebas de diagnostico.{% endblock %}
+{% block page_status %}IA disponible{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/chat.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const mensaje = document.querySelector('textarea[name="mensaje"]');
+    const formulario = document.querySelector(".chat-form");
+
+    mensaje.addEventListener("keydown", function (evento) {
+        if (evento.key === "Enter" && !evento.shiftKey) {
+            evento.preventDefault();
+
+            if (mensaje.value.trim()) {
+                formulario.submit();
+            }
+        }
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+
+    <aside class="machine-info">
+        <span class="machine-icon"><i class="bi bi-pc-display"></i></span>
+        <h2>{{ maquina.nombre }}</h2>
+        <p><strong>IP:</strong> {{ maquina.ip }}</p>
+        <p><strong>Estado:</strong> {{ maquina.get_estado_display }}</p>
+
+        {% if maquina.ultima_revision %}
+            <p><strong>Ultima revision:</strong> {{ maquina.ultima_revision|date:"d/m/Y H:i" }}</p>
+        {% endif %}
+
+        <div class="help-box">
+            <strong>Ejemplos</strong>
+            <p>¿La maquina responde?</p>
+            <p>Ejecuta un ping.</p>
+            <p>Realiza un diagnostico.</p>
+        </div>
+
+        <a href="{% url 'listar_maquinas' %}" class="back-link">
+            <i class="bi bi-arrow-left"></i> Volver a maquinas
+        </a>
+    </aside>
+
+    <section class="chat-panel">
+        <div class="messages">
+            {% for mensaje in mensajes %}
+                <div class="message {% if mensaje.emisor == 'tecnico' %}message-user{% else %}message-ai{% endif %}">
+                    <strong>
+                        {% if mensaje.emisor == "tecnico" %}
+                            Tecnico
+                        {% else %}
+                            LozAI
+                        {% endif %}
+                    </strong>
+                    <p>{{ mensaje.contenido|linebreaksbr }}</p>
+                    <small>{{ mensaje.fecha|date:"d/m/Y H:i" }}</small>
+                </div>
+            {% empty %}
+                <div class="empty-chat">
+                    <i class="bi bi-robot"></i>
+                    <h2>Inicia una consulta</h2>
+                    <p>Escribe un mensaje sobre la maquina seleccionada.</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <form method="post" class="chat-form">
+            {% csrf_token %}
+            <textarea name="mensaje"
+                    rows="2"
+                    placeholder="Escribe tu consulta tecnica..."
+                    required></textarea>
+            <button type="submit">
+                Enviar <i class="bi bi-send"></i>
+            </button>
+        </form>
+    </section>
+
+</div>
+{% endblock %}

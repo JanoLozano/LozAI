@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Centro tecnico | LozAI{% endblock %}
+{% block page_eyebrow %}Mesa de trabajo{% endblock %}
+{% block page_title %}Centro tecnico{% endblock %}
+{% block page_description %}Gestiona equipos y solicitudes de soporte.{% endblock %}
+{% block page_status %}Herramientas disponibles{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="dashboard-section">
+    <header class="section-heading">
+        <span class="section-kicker">Herramientas</span>
+        <h2>Selecciona una opcion</h2>
+    </header>
+
+    <div class="dashboard-grid">
+        <a href="{% url 'listar_tickets' %}" class="stat-card">
+            <span class="stat-icon"><i class="bi bi-inbox"></i></span>
+            <h3>Soporte</h3>
+            <strong>Tickets</strong>
+            <p>Revisa solicitudes y registra su seguimiento.</p>
+            <span class="stat-link">Ver tickets <i class="bi bi-arrow-right"></i></span>
+        </a>
+
+        <a href="{% url 'listar_maquinas' %}" class="stat-card">
+            <span class="stat-icon"><i class="bi bi-pc-display"></i></span>
+            <h3>Equipos</h3>
+            <strong>Maquinas</strong>
+            <p>Consulta equipos y utiliza las herramientas de diagnostico.</p>
+            <span class="stat-link">Ver maquinas <i class="bi bi-arrow-right"></i></span>
+        </a>
+    </div>
+</section>
+
+<section class="dashboard-section">
+    <header class="section-heading">
+        <span class="section-kicker">Proceso</span>
+        <h2>Flujo de trabajo</h2>
+    </header>
+
+    <ol class="process-list">
+        <li><span>1</span><div><strong>Revisar</strong><small>Consulta el ticket.</small></div></li>
+        <li><span>2</span><div><strong>Diagnosticar</strong><small>Analiza la maquina.</small></div></li>
+        <li><span>3</span><div><strong>Actualizar</strong><small>Registra el resultado.</small></div></li>
+    </ol>
+</section>
+{% endblock %}

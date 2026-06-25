@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Maquinas | LozAI{% endblock %}
+{% block page_eyebrow %}Area tecnica{% endblock %}
+{% block page_title %}
+    {% if maquina %}Editar maquina{% elif request.resolver_match.url_name == "crear_maquina" %}Nueva maquina{% else %}Maquinas{% endif %}
+{% endblock %}
+{% block page_description %}
+    {% if maquina %}
+        Modifica los datos del equipo.
+    {% elif request.resolver_match.url_name == "crear_maquina" %}
+        Registra un nuevo equipo en el sistema.
+    {% else %}
+        Consulta y administra los equipos registrados.
+    {% endif %}
+{% endblock %}
+{% block page_status %}Gestion de equipos{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/maquina.css' %}">
+{% endblock %}
+
+{% block content %}
+{% if maquina or request.resolver_match.url_name == "crear_maquina" %}
+    <section class="machine-form">
+        <h2>{% if maquina %}Editar equipo{% else %}Registrar equipo{% endif %}</h2>
+
+        {% if error %}
+            <div class="error-message">{{ error }}</div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            <label for="nombre">Nombre</label>
+            <input type="text"
+                id="nombre"
+                name="nombre"
+                value="{{ maquina.nombre|default:'' }}"
+                required>
+
+            <label for="ip">Direccion IP</label>
+            <input type="text"
+                id="ip"
+                name="ip"
+                value="{{ maquina.ip|default:'' }}"
+                placeholder="192.168.1.10"
+                required>
+
+            <label for="estado">Estado</label>
+            <select id="estado" name="estado">
+                <option value="activa" {% if maquina.estado == "activa" %}selected{% endif %}>
+                    Activa
+                </option>
+                <option value="inactiva" {% if maquina.estado == "inactiva" %}selected{% endif %}>
+                    Inactiva
+                </option>
+            </select>
+
+            <div class="form-actions">
+                <a href="{% url 'listar_maquinas' %}">Cancelar</a>
+                <button type="submit">
+                    {% if maquina %}Guardar cambios{% else %}Crear maquina{% endif %}
+                </button>
+            </div>
+        </form>
+    </section>
+{% else %}
+    <section class="machines-panel">
+        <div class="machines-heading">
+            <div>
+                <h2>Equipos registrados</h2>
+                <p>Total: {{ maquinas|length }}</p>
+            </div>
+            <a href="{% url 'crear_maquina' %}">
+                <i class="bi bi-plus-lg"></i> Nueva maquina
+            </a>
+        </div>
+
+        <div class="machines-grid">
+            {% for item in maquinas %}
+                <article class="machine-card">
+                    <div class="machine-header">
+                        <span class="machine-icon"><i class="bi bi-pc-display"></i></span>
+
+                        {% if item.activo %}
+                            <span class="status active">Habilitada</span>
+                        {% else %}
+                            <span class="status inactive">Deshabilitada</span>
+                        {% endif %}
+                    </div>
+
+                    <h3>{{ item.nombre }}</h3>
+                    <p><strong>IP:</strong> {{ item.ip }}</p>
+                    <p><strong>Estado:</strong> {{ item.get_estado_display }}</p>
+
+                    {% if item.ultima_revision %}
+                        <small>Ultima revision: {{ item.ultima_revision|date:"d/m/Y H:i" }}</small>
+                    {% else %}
+                        <small>Sin revisiones registradas</small>
+                    {% endif %}
+
+                    <div class="machine-actions">
+                        <a href="{% url 'chat_maquina' item.id %}" class="chat">
+                            <i class="bi bi-chat-dots"></i> Chat
+                        </a>
+                        <a href="{% url 'editar_maquina' item.id %}">Editar</a>
+                        <a href="{% url 'eliminar_maquina' item.id %}">
+                            {% if item.activo %}Desactivar{% else %}Activar{% endif %}
+                        </a>
+                    </div>
+                </article>
+            {% empty %}
+                <p class="empty-message">No hay maquinas registradas.</p>
+            {% endfor %}
+        </div>
+    </section>
+{% endif %}
+{% endblock %}

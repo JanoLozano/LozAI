@@ -1,9 +1,0 @@
-<h1>Dashboard Técnico</h1>
-
-<p>Bienvenido, {{ request.session.usuario_nombre }}</p>
-
-<ul>
-    <li><a href="{% url 'listar_maquinas' %}">Gestionar máquinas</a></li>
-    <li><a href="{% url 'listar_tickets' %}">Gestionar tickets</a></li>
-    <li><a href="{% url 'logout' %}">Cerrar sesión</a></li>
-</ul>

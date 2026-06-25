@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if modo_usuario %}Mis tickets{% else %}Crear ticket{% endif %} | LozAI{% endblock %}
+{% block page_eyebrow %}Soporte{% endblock %}
+{% block page_title %}{% if modo_usuario %}Mis tickets{% else %}Crear ticket{% endif %}{% endblock %}
+{% block page_description %}
+    {% if modo_usuario %}
+        Consulta el estado y seguimiento de tus solicitudes.
+    {% else %}
+        Describe el problema para recibir asistencia tecnica.
+    {% endif %}
+{% endblock %}
+{% block page_status %}Soporte disponible{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/usuario_tickets.css' %}">
+{% endblock %}
+
+{% block content %}
+{% if modo_usuario %}
+    <div class="user-tickets">
+        <section class="ticket-list">
+            <div class="section-title">
+                <h2>Solicitudes</h2>
+                <a href="{% url 'crear_ticket' %}">Nuevo ticket</a>
+            </div>
+
+            {% for ticket in tickets %}
+                <a href="{% url 'detalle_mi_ticket' usuario_actual.id ticket.id %}"
+                    class="ticket-card {% if ticket_seleccionado.id == ticket.id %}active{% endif %}">
+                    <div>
+                        <strong>Ticket #{{ ticket.id }}</strong>
+                        <span class="estado estado-{{ ticket.estado }}">{{ ticket.get_estado_display }}</span>
+                    </div>
+                    <p>{{ ticket.descripcion|truncatechars:75 }}</p>
+                    <small>{{ ticket.fecha_creacion|date:"d/m/Y" }}</small>
+                </a>
+            {% empty %}
+                <p class="empty">Todavia no creaste ningun ticket.</p>
+            {% endfor %}
+        </section>
+
+        <section class="ticket-detail">
+            {% if ticket_seleccionado %}
+                <h2>Ticket #{{ ticket_seleccionado.id }}</h2>
+
+                <div class="ticket-info">
+                    <p><strong>Estado:</strong> {{ ticket_seleccionado.get_estado_display }}</p>
+                    <p>
+                        <strong>Maquina:</strong>
+                        {% if ticket_seleccionado.maquina %}
+                            {{ ticket_seleccionado.maquina.nombre }}
+                        {% else %}
+                            Sin maquina asociada
+                        {% endif %}
+                    </p>
+                    <p><strong>Descripcion:</strong></p>
+                    <p>{{ ticket_seleccionado.descripcion }}</p>
+                </div>
+
+                <h3>Seguimiento</h3>
+                {% for item in seguimiento %}
+                    <div class="history-item">
+                        <small>{{ item.fecha|date:"d/m/Y H:i" }}</small>
+                        {% if item.estado_anterior != item.estado_nuevo %}
+                            <p>Estado: {{ item.estado_anterior|default:"Inicio" }} → {{ item.estado_nuevo }}</p>
+                        {% endif %}
+                        {% if item.comentario %}<p>{{ item.comentario }}</p>{% endif %}
+                    </div>
+                {% empty %}
+                    <p class="empty">Este ticket todavia no tiene actualizaciones.</p>
+                {% endfor %}
+            {% else %}
+                <div class="select-ticket">
+                    <i class="bi bi-ticket"></i>
+                    <h2>Selecciona un ticket</h2>
+                    <p>Elige una solicitud para ver sus detalles.</p>
+                </div>
+            {% endif %}
+        </section>
+    </div>
+{% else %}
+    <section class="create-ticket">
+        <h2>Nueva solicitud</h2>
+
+        {% if error %}
+            <div class="error-message">{{ error }}</div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            <label for="maquina">Maquina</label>
+            <select name="maquina" id="maquina">
+                <option value="">Sin maquina asociada</option>
+                {% for maquina in maquinas %}
+                    <option value="{{ maquina.id }}">{{ maquina.nombre }} - {{ maquina.ip }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="descripcion">Descripcion del problema</label>
+            <textarea name="descripcion"
+                    id="descripcion"
+                    rows="6"
+                    placeholder="Explica que problema estas teniendo..."
+                    required></textarea>
+
+            <button type="submit">Crear ticket</button>
+        </form>
+    </section>
+{% endif %}
+{% endblock %}

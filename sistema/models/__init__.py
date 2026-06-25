@@ -6,3 +6,4 @@ from .historial import Historial
 from .resultado_accion import ResultadoAccion
 from .sesion import Sesion
 from .seguimiento_ticket import SeguimientoTicket
+from .mensaje_sesion import MensajeSesion
