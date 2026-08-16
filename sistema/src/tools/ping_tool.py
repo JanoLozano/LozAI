@@ -1,6 +1,12 @@
 import subprocess
 
-class PingTool:
+from .tool import Tool
+
+class PingTool(Tool):
+
+    nombre = "ping"
+    descripcion = "Comprueba la conectividad con una máquina."
+
     def ejecutar(self, maquina):
         try:
             comando = ["ping", "-n", "4", maquina.ip]

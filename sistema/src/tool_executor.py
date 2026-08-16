@@ -1,11 +1,18 @@
 from sistema.src.tools.ping_tool import PingTool
 from sistema.src.tools.diagnostico_tool import DiagnosticoTool
 
+
 class ToolExecutor:
+
     def __init__(self):
+        tools = [
+            PingTool(),
+            DiagnosticoTool(),
+        ]
+
         self.herramientas = {
-            'ping': PingTool(),
-            'diagnostico': DiagnosticoTool(),
+            tool.nombre: tool
+            for tool in tools
         }
 
     def ejecutar(self, nombre_herramienta, maquina):
@@ -15,3 +22,6 @@ class ToolExecutor:
             return "Herramienta no encontrada."
 
         return herramienta.ejecutar(maquina)
+    
+    def obtener_herramientas(self):
+        return list(self.herramientas.values())

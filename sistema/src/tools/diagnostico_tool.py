@@ -4,6 +4,10 @@ from datetime import datetime
 
 
 class DiagnosticoTool:
+
+    nombre = "diagnostico"
+    descripcion = "Obtiene información de rendimiento del equipo."
+
     def ejecutar(self, maquina):
         try:
             memoria = psutil.virtual_memory()
