@@ -1,7 +1,7 @@
 import platform
 import psutil
 from datetime import datetime
-
+from .tool import Tool
 
 class DiagnosticoTool:
 

@@ -7,8 +7,9 @@ from google.genai import types
 
 load_dotenv()
 
-
+# Clase que representa un proveedor de IA para generar respuestas a consultas técnicas sobre máquinas.
 class IAProvider:
+    # Inicializa el proveedor de IA, configurando la clave de API y los modelos disponibles.
     def __init__(self):
         api_key = os.getenv("GEMINI_API_KEY")
 
@@ -16,47 +17,71 @@ class IAProvider:
             raise ValueError("No se configuró la variable de entorno GEMINI_API_KEY.")
 
         self.client = genai.Client(api_key=api_key)
-        modelo_configurado = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+        modelo_configurado = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite")
         self.modelos = list(
             dict.fromkeys(
                 [
                     modelo_configurado,
                     "gemini-2.5-flash",
-                    "gemini-2.5-flash-lite",
                 ]
             )
         )
+    # Guarda la función de herramienta para ser utilizada por el modelo de IA, permitiendo que el modelo ejecute herramientas específicas según sea necesario.
+    def crear_funcion_para_gemini(self, herramienta, tool_executor, maquina):
 
+        def funcion_tool() -> str:
+            return tool_executor.ejecutar(
+                herramienta.nombre,
+                maquina
+            )
+
+        funcion_tool.__name__ = f"ejecutar_{herramienta.nombre}"
+        funcion_tool.__doc__ = herramienta.descripcion
+
+        return funcion_tool
+    # Responde a una consulta técnica sobre una máquina específica, utilizando el modelo de IA y las herramientas disponibles para obtener información relevante.
     def responder(self, maquina, mensaje, tool_executor):
-        def ejecutar_ping() -> str:
-            """Verifica la conectividad de red de la máquina seleccionada."""
-            return tool_executor.ejecutar("ping", maquina)
 
-        def ejecutar_diagnostico() -> str:
-            """Realiza un diagnóstico básico de la máquina seleccionada."""
-            return tool_executor.ejecutar("diagnostico", maquina)
+        funciones = []
+
+        for herramienta in tool_executor.obtener_herramientas():
+                funcion = self.crear_funcion_para_gemini(
+                    herramienta,
+                    tool_executor,
+                    maquina
+                )
+
+                funciones.append(funcion)
 
         prompt = f"""
-        Sos LozAI, un asistente técnico para soporte de máquinas.
+                Sos LozAI, un asistente técnico interno para soporte de equipos.
 
-        La máquina ya fue seleccionada por la URL del sistema.
-        No le preguntes al usuario qué máquina quiere revisar.
+                Tu objetivo es ayudar al técnico a diagnosticar problemas y comprender
+                el estado de la máquina seleccionada.
 
-        Máquina actual:
-        - ID: {maquina.id}
-        - Nombre: {maquina.nombre}
-        - IP: {maquina.ip}
-        - Estado: {maquina.estado}
+                MÁQUINA ACTUAL:
+                - ID: {maquina.id}
+                - Nombre: {maquina.nombre}
+                - IP: {maquina.ip}
+                - Estado registrado: {maquina.estado}
 
-        Podés usar estas herramientas cuando sean necesarias:
-        - ejecutar_ping: para verificar conectividad.
-        - ejecutar_diagnostico: para revisar información básica de la máquina.
+                REGLAS:
+                - Podés utilizar tus conocimientos técnicos para explicar conceptos,
+                interpretar resultados y recomendar acciones.
+                - No inventes datos sobre la máquina actual.
+                - Para conocer datos reales de la máquina que no estén incluidos arriba,
+                utilizá una herramienta cuando sea necesario.
+                - No ejecutes herramientas para saludos, conversación general o preguntas
+                que puedan responderse sin consultar el equipo.
+                - Ejecutá únicamente la herramienta necesaria para responder la consulta.
+                - No ejecutes varias herramientas salvo que la consulta realmente requiera
+                información de más de una.
+                - Si no podés obtener un dato solicitado, indicá que no está disponible.
+                - Respondé de forma clara, breve y orientada a soporte técnico.
 
-        Respondé de forma clara, breve y útil.
-
-        Mensaje del técnico:
-        {mensaje}
-        """
+                MENSAJE DEL TÉCNICO:
+                {mensaje}
+                """
 
         ultimo_error = None
 
@@ -66,9 +91,23 @@ class IAProvider:
                     model=model_name,
                     contents=prompt,
                     config=types.GenerateContentConfig(
-                        tools=[ejecutar_ping, ejecutar_diagnostico]
+                    tools=funciones,
+
+                    tool_config=types.ToolConfig(
+                        function_calling_config=types.FunctionCallingConfig(
+                            mode="AUTO"
+                        )
                     ),
+
+                    thinking_config=types.ThinkingConfig(
+                        thinking_budget=0
+                    ),
+
+                    max_output_tokens=300,
+                    )
                 )
+                
+                    
                 break
             except (errors.ClientError, errors.ServerError) as error:
                 ultimo_error = error
