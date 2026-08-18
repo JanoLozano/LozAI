@@ -1,4 +1,5 @@
 from django.shortcuts import redirect
+from functools import wraps
 
 DASHBOARD_POR_ROL = {
     "admin": "dashboard_admin",
@@ -20,3 +21,24 @@ def validar_roles(request, roles_permitidos):
         return redirigir_segun_rol(request)
 
     return None
+
+def requiere_roles(roles_permitidos):
+
+    def decorador(funcion):
+
+        @wraps(funcion)
+        def funcion_protegida(request, *args, **kwargs):
+
+            redireccion = validar_roles(
+                request,
+                roles_permitidos
+            )
+
+            if redireccion:
+                return redireccion
+
+            return funcion(request, *args, **kwargs)
+
+        return funcion_protegida
+
+    return decorador

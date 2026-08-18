@@ -11,23 +11,6 @@
 <link rel="stylesheet" href="{% static 'css/chat.css' %}">
 {% endblock %}
 
-{% block extra_js %}
-<script>
-    const mensaje = document.querySelector('textarea[name="mensaje"]');
-    const formulario = document.querySelector(".chat-form");
-
-    mensaje.addEventListener("keydown", function (evento) {
-        if (evento.key === "Enter" && !evento.shiftKey) {
-            evento.preventDefault();
-
-            if (mensaje.value.trim()) {
-                formulario.submit();
-            }
-        }
-    });
-</script>
-{% endblock %}
-
 {% block content %}
 <div class="chat-container">
 
@@ -76,7 +59,7 @@
             {% endfor %}
         </div>
 
-        <form method="post" class="chat-form">
+        <form method="post" class="chat-form" data-url="{% url 'enviar_mensaje_lozai' maquina.id %}">
             {% csrf_token %}
             <textarea name="mensaje"
                     rows="2"
@@ -89,4 +72,7 @@
     </section>
 
 </div>
+{% endblock %}
+{% block extra_js %}
+    <script src="{% static 'js/chat.js' %}"></script>
 {% endblock %}

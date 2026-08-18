@@ -29,7 +29,7 @@ from sistema.controllers.ticket_controller import (
     crear_ticket,
     cambiar_estado_ticket
 )
-from sistema.controllers.lozai_controller import chat_lozai
+from sistema.controllers.lozai_controller import chat_lozai, enviar_mensaje_lozai
 
 urlpatterns = [
     # Rutas para el panel de control
@@ -60,4 +60,5 @@ urlpatterns = [
     path('usuarios/<int:usuario_id>/editar/', editar_usuario, name='editar_usuario'),
     path('usuarios/<int:usuario_id>/eliminar/', cambiar_estado_usuario, name='cambiar_estado_usuario'),
     path('maquinas/<int:maquina_id>/chat/', chat_lozai, name='chat_maquina'),
+    path('maquinas/<int:maquina_id>/chat/enviar/', enviar_mensaje_lozai, name='enviar_mensaje_lozai'),
 ]
