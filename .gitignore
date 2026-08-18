@@ -1,7 +1,30 @@
-﻿venv/
+﻿# Entorno y variables
+venv/
+.env
+.env.*
+!.env.example
+
+# Python
 __pycache__/
 *.pyc
+
+# Bases de datos locales
 db.sqlite3
-.env
-.vscode/
+*.sqlite3
 lozai_db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Archivos temporales y backups
+*.zip
+*.bak
+*.tmp
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
