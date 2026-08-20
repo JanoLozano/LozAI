@@ -3,7 +3,7 @@ import psutil
 from datetime import datetime
 from .tool import Tool
 
-class DiagnosticoTool:
+class DiagnosticoTool(Tool):
 
     nombre = "diagnostico"
     descripcion = "Obtiene información de rendimiento del equipo."
