@@ -24,7 +24,6 @@ def obtener_contexto_chat(request, maquina_id):
 # Vista para mostrar la interfaz de chat con LozAI
 @requiere_roles(["tecnico"])
 def chat_lozai(request, maquina_id):
-    
     #  Contexto del chat, incluyendo la máquina, el usuario y la sesión
     maquina, usuario, sesion = obtener_contexto_chat(
         request,
