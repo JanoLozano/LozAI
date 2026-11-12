@@ -5,6 +5,9 @@ from sistema.src.autorizacion import validar_roles
 from django.views.decorators.http import require_POST
 from django.core.validators import validate_ipv46_address
 from django.core.exceptions import ValidationError
+from django.db import transaction
+from django.utils import timezone
+from sistema.models import Sesion
 
 # Listar máquinas
 def listar_maquinas(request):
@@ -177,6 +180,7 @@ def editar_maquina(request, maquina_id):
         "maquina": maquina
     })
 
+
 @require_POST
 def eliminar_maquina(request, maquina_id):
     redireccion = validar_roles(request, ["tecnico"])
@@ -184,12 +188,25 @@ def eliminar_maquina(request, maquina_id):
     if redireccion is not None:
         return redireccion
 
-    maquina = get_object_or_404(Maquina, id=maquina_id)
+    with transaction.atomic():
+        maquina = get_object_or_404(
+            Maquina.objects.select_for_update(),
+            id=maquina_id
+        )
 
-    maquina.activo = not maquina.activo
-    maquina.save(update_fields=["activo"])
+        maquina.activo = not maquina.activo
+        maquina.save(update_fields=["activo"])
+
+        if not maquina.activo:
+            Sesion.objects.filter(
+                maquina=maquina,
+                fecha_fin__isnull=True
+            ).update(
+                fecha_fin=timezone.now()
+            )
 
     return redirect("listar_maquinas")
+
 
 
     

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Historial de LozAI{% endblock %}
+{% block page_eyebrow %}Asistente técnico{% endblock %}
+{% block page_title %}Historial de conversaciones{% endblock %}
+{% block page_description %}
+    Sesiones finalizadas de {{ maquina.nombre }}.
+{% endblock %}
+{% block page_status %}Historial{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/chat.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+
+    <aside class="machine-info">
+        <h2>{{ maquina.nombre }}</h2>
+        <p><strong>IP:</strong> {{ maquina.ip }}</p>
+
+        <h3>Sesiones anteriores</h3>
+
+        {% for sesion in sesiones %}
+            <p>
+                <a href="?sesion={{ sesion.id }}">
+                    Sesión #{{ sesion.id }}
+                    <small>
+                        {{ sesion.fecha_inicio|date:"d/m/Y H:i" }}
+                    </small>
+                </a>
+            </p>
+        {% empty %}
+            <p>No hay sesiones finalizadas.</p>
+        {% endfor %}
+
+        <a href="{% url 'listar_maquinas' %}" class="back-link">
+            Volver a máquinas
+        </a>
+    </aside>
+
+    <section class="chat-panel">
+        <div class="messages">
+
+            {% if sesion_seleccionada %}
+
+                <h3>
+                    Conversación #{{ sesion_seleccionada.id }}
+                </h3>
+
+                <p>
+                    Finalizada:
+                    {{ sesion_seleccionada.fecha_fin|date:"d/m/Y H:i" }}
+                </p>
+
+                {% for mensaje in mensajes %}
+                    <div class="message {% if mensaje.emisor == 'tecnico' %}message-user{% else %}message-ai{% endif %}">
+                        <strong>
+                            {% if mensaje.emisor == "tecnico" %}
+                                Técnico
+                            {% else %}
+                                LozAI
+                            {% endif %}
+                        </strong>
+
+                        <p>{{ mensaje.contenido|linebreaksbr }}</p>
+                        <small>
+                            {{ mensaje.fecha|date:"d/m/Y H:i" }}
+                        </small>
+                    </div>
+                {% empty %}
+                    <p>Esta sesión no tiene mensajes.</p>
+                {% endfor %}
+
+            {% else %}
+                <div class="empty-chat">
+                    <h2>Seleccioná una sesión</h2>
+                    <p>Elegí una conversación para consultar su historial.</p>
+                </div>
+            {% endif %}
+
+        </div>
+    </section>
+
+</div>
+{% endblock %}

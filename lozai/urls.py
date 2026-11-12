@@ -32,7 +32,8 @@ from sistema.controllers.ticket_controller import (
 from sistema.controllers.lozai_controller import (
     chat_lozai,
     enviar_mensaje_lozai,
-    cerrar_sesion_lozai
+    cerrar_sesion_lozai,
+    historial_sesiones_lozai
 )
 
 urlpatterns = [
@@ -67,4 +68,6 @@ urlpatterns = [
     path('maquinas/<int:maquina_id>/chat/', chat_lozai, name='chat_maquina'),
     path('maquinas/<int:maquina_id>/chat/enviar/', enviar_mensaje_lozai, name='enviar_mensaje_lozai'),
     path('maquinas/<int:maquina_id>/chat/cerrar/',cerrar_sesion_lozai,name='cerrar_sesion_lozai'),
+    path(
+    "maquinas/<int:maquina_id>/chat/historial/",historial_sesiones_lozai,name="historial_sesiones_lozai"),
 ]

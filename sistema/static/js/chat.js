@@ -1,4 +1,3 @@
-
 const formulario = document.querySelector(".chat-form");
 const campoMensaje = document.querySelector('textarea[name="mensaje"]');
 const contenedorMensajes = document.querySelector(".messages");
@@ -44,7 +43,8 @@ formulario.addEventListener("submit", async function (evento) {
 
         agregarMensajeLozAI(
             resultado.respuesta,
-            resultado.fecha
+            resultado.fecha,
+            resultado.proveedor
         );
 
     } catch (error) {
@@ -87,14 +87,28 @@ function agregarMensajeTecnico(texto) {
     moverChatAlFinal();
 }
 
-function agregarMensajeLozAI(texto, fecha = "Ahora") {
+
+function agregarMensajeLozAI(texto, fecha = "Ahora", proveedor = null) {
     eliminarChatVacio();
 
     const mensaje = document.createElement("div");
     mensaje.className = "message message-ai";
 
+    let informacionProveedor = "";
+
+    if (proveedor) {
+        informacionProveedor = `
+            <span class="badge bg-secondary ms-2">
+                ${escaparHTML(proveedor)}
+            </span>
+        `;
+    }
+
     mensaje.innerHTML = `
-        <strong>LozAI</strong>
+        <strong>
+            LozAI
+            ${informacionProveedor}
+        </strong>
         <p>${escaparHTML(texto).replace(/\n/g, "<br>")}</p>
         <small>${escaparHTML(fecha)}</small>
     `;
@@ -102,6 +116,7 @@ function agregarMensajeLozAI(texto, fecha = "Ahora") {
     contenedorMensajes.appendChild(mensaje);
     moverChatAlFinal();
 }
+
 
 function agregarMensajeSistema(texto) {
     eliminarChatVacio();
