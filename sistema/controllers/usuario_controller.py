@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from sistema.models import Usuario
 from sistema.src.autorizacion import validar_roles
+from django.views.decorators.http import require_POST
 
 def listar_usuarios(request):
     redireccion = validar_roles(request, ["admin"])
@@ -38,14 +39,21 @@ def editar_usuario(request, usuario_id):
         'usuario': usuario
     })
 
+@require_POST
 def cambiar_estado_usuario(request, usuario_id):
     redireccion = validar_roles(request, ["admin"])
-    if redireccion:
+
+    if redireccion is not None:
         return redireccion
 
     usuario = get_object_or_404(Usuario, id=usuario_id)
 
-    usuario.activo = not usuario.activo
-    usuario.save()
+    # Impedir que el administrador desactive su propia cuenta.
+    if usuario.id == request.session.get("usuario_id"):
+        return redirect("listar_usuarios")
 
-    return redirect('listar_usuarios')
+    usuario.activo = not usuario.activo
+    usuario.save(update_fields=["activo"])
+
+    return redirect("listar_usuarios")
+

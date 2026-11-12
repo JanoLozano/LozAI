@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.db import IntegrityError
 from sistema.models import Maquina
 from sistema.src.autorizacion import validar_roles
+from django.views.decorators.http import require_POST
 
 # Listar máquinas
 def listar_maquinas(request):
@@ -79,17 +80,20 @@ def editar_maquina(request, maquina_id):
 
     return render(request, 'tecnico/maquinas.html', {'maquina': maquina})
 
+@require_POST
 def eliminar_maquina(request, maquina_id):
     redireccion = validar_roles(request, ["tecnico"])
-    if redireccion:
+
+    if redireccion is not None:
         return redireccion
 
     maquina = get_object_or_404(Maquina, id=maquina_id)
 
     maquina.activo = not maquina.activo
-    maquina.save()
-    
-    return redirect('listar_maquinas')
+    maquina.save(update_fields=["activo"])
+
+    return redirect("listar_maquinas")
+
 
     
 

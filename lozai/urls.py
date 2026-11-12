@@ -59,6 +59,7 @@ urlpatterns = [
     path('usuarios/', listar_usuarios, name='listar_usuarios'),
     path('usuarios/<int:usuario_id>/editar/', editar_usuario, name='editar_usuario'),
     path('usuarios/<int:usuario_id>/eliminar/', cambiar_estado_usuario, name='cambiar_estado_usuario'),
+    # Rutas maquinas y chat con LozAI
     path('maquinas/<int:maquina_id>/chat/', chat_lozai, name='chat_maquina'),
     path('maquinas/<int:maquina_id>/chat/enviar/', enviar_mensaje_lozai, name='enviar_mensaje_lozai'),
 ]

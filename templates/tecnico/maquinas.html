@@ -106,9 +106,17 @@
                             <i class="bi bi-chat-dots"></i> Chat
                         </a>
                         <a href="{% url 'editar_maquina' item.id %}">Editar</a>
-                        <a href="{% url 'eliminar_maquina' item.id %}">
-                            {% if item.activo %}Desactivar{% else %}Activar{% endif %}
-                        </a>
+                        <form method="post"
+                            action="{% url 'eliminar_maquina' item.id %}">
+                            {% csrf_token %}
+                            <button type="submit">
+                                {% if item.activo %}
+                                    Desactivar
+                                {% else %}
+                                    Activar
+                                {% endif %}
+                            </button>
+                        </form>
                     </div>
                 </article>
             {% empty %}

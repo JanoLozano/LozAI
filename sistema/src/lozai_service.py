@@ -1,7 +1,6 @@
 from sistema.src.tool_executor import ToolExecutor
 from sistema.src.providers.ollama_provider import OllamaProvider
 
-
 class LozAIService:
     def __init__(self):
         self.tool_executor = ToolExecutor()

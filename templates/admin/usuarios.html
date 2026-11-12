@@ -93,9 +93,19 @@
                         <a href="{% url 'editar_usuario' item.id %}" class="edit">
                             <i class="bi bi-pencil"></i> Editar
                         </a>
-                        <a href="{% url 'cambiar_estado_usuario' item.id %}" class="state">
-                            {% if item.activo %}Desactivar{% else %}Activar{% endif %}
-                        </a>
+                        <form method="post"
+                            action="{% url 'cambiar_estado_usuario' item.id %}">
+                            {% csrf_token %}
+
+                            <button type="submit" class="state">
+                                {% if item.activo %}
+                                    Desactivar
+                                {% else %}
+                                    Activar
+                                {% endif %}
+                            </button>
+                        </form>
+
                     </div>
                 </div>
             {% empty %}
