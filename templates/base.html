@@ -1,3 +1,4 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
@@ -27,7 +28,7 @@
                 <a href="{% url 'listar_usuarios' %}">Usuarios</a>
             {% elif request.session.usuario_rol == "tecnico" %}
                 <a href="{% url 'dashboard_tecnico' %}">Inicio</a>
-                <a href="{% url 'listar_maquinas' %}">Maquinas</a>
+                <a href="{% url 'listar_maquinas' %}">Máquinas</a>
                 <a href="{% url 'listar_tickets' %}">Tickets</a>
             {% elif request.session.usuario_rol == "usuario" %}
                 <a href="{% url 'dashboard_usuario' %}">Inicio</a>
@@ -38,7 +39,7 @@
 
         <div class="loz-user">
             <span>{{ request.session.usuario_nombre }}</span>
-            <a href="{% url 'logout' %}" title="Cerrar sesion">
+            <a href="{% url 'logout' %}" title="Cerrar sesión">
                 <i class="bi bi-box-arrow-right"></i>
             </a>
         </div>
@@ -49,12 +50,30 @@
             <div>
                 <small>{% block page_eyebrow %}Panel LozAI{% endblock %}</small>
                 <h1>{% block page_title %}Panel{% endblock %}</h1>
-                <p>{% block page_description %}Gestiona el sistema desde este panel.{% endblock %}</p>
+                <p>{% block page_description %}Gestioná el sistema desde este panel.{% endblock %}</p>
             </div>
             <span class="loz-status">{% block page_status %}Disponible{% endblock %}</span>
         </section>
 
         <section class="loz-content">
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show"
+                        role="alert">
+
+                        <i class="bi bi-info-circle me-2"></i>
+                        {{ message }}
+
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="alert"
+                                aria-label="Cerrar">
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
             {% block content %}{% endblock %}
         </section>
     </main>

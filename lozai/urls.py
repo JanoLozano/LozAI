@@ -29,7 +29,11 @@ from sistema.controllers.ticket_controller import (
     crear_ticket,
     cambiar_estado_ticket
 )
-from sistema.controllers.lozai_controller import chat_lozai, enviar_mensaje_lozai
+from sistema.controllers.lozai_controller import (
+    chat_lozai,
+    enviar_mensaje_lozai,
+    cerrar_sesion_lozai
+)
 
 urlpatterns = [
     # Rutas para el panel de control
@@ -62,4 +66,5 @@ urlpatterns = [
     # Rutas maquinas y chat con LozAI
     path('maquinas/<int:maquina_id>/chat/', chat_lozai, name='chat_maquina'),
     path('maquinas/<int:maquina_id>/chat/enviar/', enviar_mensaje_lozai, name='enviar_mensaje_lozai'),
+    path('maquinas/<int:maquina_id>/chat/cerrar/',cerrar_sesion_lozai,name='cerrar_sesion_lozai'),
 ]

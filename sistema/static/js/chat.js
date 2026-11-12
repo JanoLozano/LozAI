@@ -1,18 +1,25 @@
+
 const formulario = document.querySelector(".chat-form");
 const campoMensaje = document.querySelector('textarea[name="mensaje"]');
 const contenedorMensajes = document.querySelector(".messages");
+const botonEnviar = formulario.querySelector('button[type="submit"]');
+
+let procesando = false;
 
 formulario.addEventListener("submit", async function (evento) {
     evento.preventDefault();
 
+    if (procesando) return;
+
     const texto = campoMensaje.value.trim();
 
-    if (!texto) {
-        return;
-    }
+    if (!texto) return;
+
+    procesando = true;
+    botonEnviar.disabled = true;
+    campoMensaje.disabled = true;
 
     agregarMensajeTecnico(texto);
-
     campoMensaje.value = "";
 
     const loader = agregarLoaderLozAI();
@@ -21,21 +28,16 @@ formulario.addEventListener("submit", async function (evento) {
     datos.set("mensaje", texto);
 
     try {
-        const respuesta = await fetch(
-            formulario.dataset.url,
-            {
-                method: "POST",
-                body: datos
-            }
-        );
+        const respuesta = await fetch(formulario.dataset.url, {
+            method: "POST",
+            body: datos
+        });
 
         const resultado = await respuesta.json();
 
-        loader.remove();
-
         if (!respuesta.ok) {
-            agregarMensajeLozAI(
-                resultado.error || "Ocurrió un error."
+            agregarMensajeSistema(
+                resultado.error || "No se pudo procesar la solicitud."
             );
             return;
         }
@@ -46,20 +48,26 @@ formulario.addEventListener("submit", async function (evento) {
         );
 
     } catch (error) {
-        loader.remove();
-
-        agregarMensajeLozAI(
-            "No se pudo comunicar con LozAI."
+        agregarMensajeSistema(
+            "No se pudo establecer comunicación con el servidor."
         );
+
+    } finally {
+        loader.remove();
+        procesando = false;
+        botonEnviar.disabled = false;
+        campoMensaje.disabled = false;
+        campoMensaje.focus();
     }
 });
 
 campoMensaje.addEventListener("keydown", function (evento) {
-
     if (evento.key === "Enter" && !evento.shiftKey) {
         evento.preventDefault();
 
-        formulario.requestSubmit();
+        if (!procesando) {
+            formulario.requestSubmit();
+        }
     }
 });
 
@@ -67,40 +75,52 @@ function agregarMensajeTecnico(texto) {
     eliminarChatVacio();
 
     const mensaje = document.createElement("div");
-
     mensaje.className = "message message-user";
 
     mensaje.innerHTML = `
-        <strong>Tecnico</strong>
+        <strong>Técnico</strong>
         <p>${escaparHTML(texto)}</p>
         <small>Ahora</small>
     `;
 
     contenedorMensajes.appendChild(mensaje);
-
     moverChatAlFinal();
 }
 
 function agregarMensajeLozAI(texto, fecha = "Ahora") {
-    const mensaje = document.createElement("div");
+    eliminarChatVacio();
 
+    const mensaje = document.createElement("div");
     mensaje.className = "message message-ai";
 
     mensaje.innerHTML = `
         <strong>LozAI</strong>
         <p>${escaparHTML(texto).replace(/\n/g, "<br>")}</p>
-        <small>${fecha}</small>
+        <small>${escaparHTML(fecha)}</small>
     `;
 
     contenedorMensajes.appendChild(mensaje);
-
     moverChatAlFinal();
 }
 
+function agregarMensajeSistema(texto) {
+    eliminarChatVacio();
+
+    const mensaje = document.createElement("div");
+    mensaje.className = "alert alert-danger mt-2";
+    mensaje.setAttribute("role", "alert");
+
+    mensaje.innerHTML = `
+        <strong><i class="bi bi-exclamation-triangle"></i> Sistema</strong>
+        <p class="mb-0">${escaparHTML(texto)}</p>
+    `;
+
+    contenedorMensajes.appendChild(mensaje);
+    moverChatAlFinal();
+}
 
 function agregarLoaderLozAI() {
     const loader = document.createElement("div");
-
     loader.className = "message message-ai message-loading";
 
     loader.innerHTML = `
@@ -109,15 +129,13 @@ function agregarLoaderLozAI() {
     `;
 
     contenedorMensajes.appendChild(loader);
-
     moverChatAlFinal();
 
     return loader;
 }
 
 function moverChatAlFinal() {
-    contenedorMensajes.scrollTop =
-        contenedorMensajes.scrollHeight;
+    contenedorMensajes.scrollTop = contenedorMensajes.scrollHeight;
 }
 
 function eliminarChatVacio() {
@@ -130,9 +148,6 @@ function eliminarChatVacio() {
 
 function escaparHTML(texto) {
     const elemento = document.createElement("div");
-
     elemento.textContent = texto;
-
     return elemento.innerHTML;
 }
-

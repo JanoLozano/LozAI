@@ -34,6 +34,17 @@
         <a href="{% url 'listar_maquinas' %}" class="back-link">
             <i class="bi bi-arrow-left"></i> Volver a maquinas
         </a>
+        <form method="post"
+            action="{% url 'cerrar_sesion_lozai' maquina.id %}">
+            {% csrf_token %}
+
+            <button type="submit"
+                    class="btn btn-outline-danger mt-3 w-100"
+                    onclick="return confirm('¿Finalizar esta sesión de LozAI?');">
+                <i class="bi bi-x-circle"></i>
+                Finalizar sesión
+            </button>
+        </form>
     </aside>
 
     <section class="chat-panel">
